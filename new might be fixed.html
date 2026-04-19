@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Digitálna Vizitka</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --text-dark: #1f2937;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        h2 { color: var(--text-dark); margin-bottom: 10px; font-weight: 600; font-size: 1.8rem; }
+        .job-title { color: #555; font-size: 1.1rem; margin-bottom: 30px; font-weight: 300; }
+
+        #qrcode {
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        #qrcode img { display: block; margin: 0 auto; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        
+        .editor {
+            display: none;
+            margin-top: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 0.9rem; color: #666; margin-bottom: 8px; font-weight: 500; }
+        
+        input {
+            width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px;
+            font-size: 1rem; outline: none; transition: border-color 0.3s;
+        }
+        input:focus { border-color: var(--primary); }
+        input[type="color"] { height: 45px; padding: 2px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="card-view" class="card">
+            <h2 id="display-name">Meno Priezvisko</h2>
+            <div class="job-title" id="display-job">Pracovná pozícia</div>
+            <div id="qrcode"></div>
+            <br>
+            <button class="btn" onclick="toggleEditor()">
+                <i class="fas fa-edit"></i> Upraviť údaje
+            </button>
+        </div>
+
+        <div id="editor-view" class="editor">
+            <h3><i class="fas fa-cog"></i> Nastavenia vizitky</h3>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+            <div class="form-group">
+                <label>Meno a Priezvisko</label>
+                <input type="text" id="input-name" placeholder="napr. Ján Novák">
+            </div>
+            <div class="form-group">
+                <label>Pracovná pozícia / Firma</label>
+                <input type="text" id="input-job" placeholder="napr. Študent, Gymnázium...">
+            </div>
+            <div class="form-group">
+                <label>Telefón</label>
+                <input type="tel" id="input-phone" placeholder="+421 900 000 000">
+            </div>
+            <div class="form-group">
+                <label>E-mailová adresa</label>
+                <input type="email" id="input-email" placeholder="email@domena.sk">
+            </div>
+            <div class="form-group">
+                <label>Farebná téma</label>
+                <input type="color" id="input-color" value="#6366f1" oninput="previewTheme()">
+            </div>
+
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="saveData()">
+                <i class="fas fa-save"></i> Uložiť a pregenerovať
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        const qrContainer = document.getElementById('qrcode');
+
+        // Use DOMContentLoaded to ensure library is ready before script runs
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const savedData = localStorage.getItem('myBizCard_V4_Simple');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    updateUI(data);
+                    fillInputs(data);
+                    document.documentElement.style.setProperty('--primary', data.color);
+                } else {
+                    initDefault();
+                }
+            } catch (e) {
+                console.error("Error loading data:", e);
+                initDefault();
+            }
+        });
+
+        function initDefault() {
+            const defaultData = {
+                name: "Vaše Meno",
+                job: "Vaša Pozícia alebo Firma",
+                phone: "",
+                email: "",
+                color: "#6366f1"
+            };
+            updateUI(defaultData);
+            fillInputs(defaultData);
+        }
+
+        function generateQR(data) {
+            qrContainer.innerHTML = "";
+            
+            // Explicitly join lines with \n for mobile scanner compatibility
+            const vCardData = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                `FN;CHARSET=UTF-8:${data.name}`,
+                `N;CHARSET=UTF-8:${data.name};;;;`,
+                `ORG;CHARSET=UTF-8:${data.job}`,
+                `TEL;TYPE=CELL:${data.phone}`,
+                `EMAIL:${data.email}`,
+                "END:VCARD"
+            ].join("\n");
+
+            new QRCode(qrContainer, {
+                text: vCardData,
+                width: 220,
+                height: 220,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H // High correction for easier scanning
+            });
+        }
+
+        function saveData() {
+            const data = {
+                name: document.getElementById('input-name').value || "Bez mena",
+                job: document.getElementById('input-job').value || "",
+                phone: document.getElementById('input-phone').value || "",
+                email: document.getElementById('input-email').value || "",
+                color: document.getElementById('input-color').value
+            };
+
+            try {
+                localStorage.setItem('myBizCard_V4_Simple', JSON.stringify(data));
+                updateUI(data);
+                alert("Údaje uložené!");
+                document.getElementById('editor-view').style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                alert("Chyba pri ukladaní.");
+            }
+        }
+
+        function updateUI(data) {
+            document.getElementById('display-name').innerText = data.name;
+            document.getElementById('display-job').innerText = data.job;
+            generateQR(data);
+        }
+
+        function fillInputs(data) {
+            document.getElementById('input-name').value = data.name;
+            document.getElementById('input-job').value = data.job;
+            document.getElementById('input-phone').value = data.phone;
+            document.getElementById('input-email').value = data.email;
+            document.getElementById('input-color').value = data.color;
+        }
+
+        function previewTheme() {
+            const color = document.getElementById('input-color').value;
+            document.documentElement.style.setProperty('--primary', color);
+        }
+
+        function toggleEditor() {
+            const editor = document.getElementById('editor-view');
+            if (editor.style.display === 'none' || editor.style.display === '') {
+                const password = prompt("Heslo (admin123):");
+                if (password === "admin123") {
+                    editor.style.display = 'block';
+                    editor.scrollIntoView({behavior: "smooth"});
+                } else {
+                    alert("Nesprávne heslo.");
+                }
+            } else {
+                editor.style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
